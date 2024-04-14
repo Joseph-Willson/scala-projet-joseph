@@ -38,6 +38,14 @@ object Main extends App with Job {
     }
   }
 
+  // la ya l'erreur chef !!
+  val SRC_PATH_HIVE: String = if (cliArgs.length > 1) {
+    cliArgs(1)
+  } else {
+    "./src/main/ressources/my_table"
+  }
+
+
   val DST_PATH: String = try {
     cliArgs(2)
   } catch {
@@ -98,8 +106,11 @@ object Main extends App with Job {
   val reader: Reader = new ReaderImpl(sparkSession)
   val processor: Processor = new ProcessorImpl()
   val writer: Writer = new Writer()
+
   val src_path = SRC_PATH
   val src_path_parquet = SRC_PATH_PARQUET
+  val src_path_hive = SRC_PATH_HIVE
+
   val dst_path = DST_PATH
   val dst_path_parquet = DST_PATH_PARQUET
 
@@ -107,6 +118,8 @@ object Main extends App with Job {
   inputDF.show(50)
   val inputDFparquet = reader.readParquet(src_path_parquet)
   inputDFparquet.show(50)
+  val inputDFhive = reader.readHiveTable(src_path_hive)
+  inputDFhive.show(50)
 
 
   val processedDF = processor.process(inputDF)
