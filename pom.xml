@@ -110,7 +110,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://github.com/Joseph-Willson/scala-projet-joseph.git</url>
+            <url>https://maven.pkg.github.com/Joseph-Willson/scala-projet-joseph</url>
         </repository>
     </distributionManagement>
 </project>
