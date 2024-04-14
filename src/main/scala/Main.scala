@@ -13,12 +13,15 @@ import org.apache.hadoop.fs.FileSystem
 
 object Main extends App with Job {
 
+
   val cliArgs = args
   val MASTER_URL: String = try {
     cliArgs(0)
   } catch {
     case e: java.lang.ArrayIndexOutOfBoundsException => "local[1]"
   }
+
+
   val SRC_PATH: String = try {
     cliArgs(1)
   } catch {
@@ -26,11 +29,28 @@ object Main extends App with Job {
       "./src/main/ressources/data.csv"
     }
   }
+
+  val SRC_PATH_PARQUET: String = try {
+    cliArgs(1)
+  } catch {
+    case e: java.lang.ArrayIndexOutOfBoundsException => {
+      "./src/main/ressources/cities.parquet"
+    }
+  }
+
   val DST_PATH: String = try {
     cliArgs(2)
   } catch {
     case e: java.lang.ArrayIndexOutOfBoundsException => {
-      "./default/output-writer"
+      "./default/output-writer-csv"
+    }
+  }
+
+  val DST_PATH_PARQUET: String = try {
+    cliArgs(2)
+  } catch {
+    case e: java.lang.ArrayIndexOutOfBoundsException => {
+      "./default/output-writer-parquet"
     }
   }
 
@@ -46,19 +66,55 @@ object Main extends App with Job {
 
   sparkSession.sparkContext.hadoopConfiguration.setClass("fs.file.impl",  classOf[ BareLocalFileSystem], classOf[FileSystem])
 
+  val spark = SparkSession.builder()
+    .appName("CreateHiveTable")
+    .enableHiveSupport()
+    .getOrCreate()
+
+  import spark.implicits._
+
+  val data = Seq(
+    (1, "John", 30),
+    (2, "Alice", 25),
+    (3, "Bob", 35)
+  )
+
+  val df = data.toDF("id", "name", "age")
+
+  val tableName = "my_table"
+  val tableLocation = "./src/main/ressources/my_table"
+
+
+  df.write
+    .mode("overwrite")
+    .option("header", "true")
+    .option("path", tableLocation)
+    .format("csv")
+    .saveAsTable(tableName)
+    .csv(s"$path/lecture.csv")
+
+
+
   val reader: Reader = new ReaderImpl(sparkSession)
   val processor: Processor = new ProcessorImpl()
   val writer: Writer = new Writer()
   val src_path = SRC_PATH
+  val src_path_parquet = SRC_PATH_PARQUET
   val dst_path = DST_PATH
+  val dst_path_parquet = DST_PATH_PARQUET
 
   val inputDF = reader.read(src_path)
   inputDF.show(50)
-//  val processedDF = processor.process(inputDF)
-  //writer.write(processedDF, "overwrite", dst_path)
-  writer.write(inputDF, "overwrite", dst_path)
+  val inputDFparquet = reader.readParquet(src_path_parquet)
+  inputDFparquet.show(50)
 
-  //override val processor: Processor = ???
-  //override val writer: Writer = ???
-  //override val processedDF: DataFrame = ???
+
+  val processedDF = processor.process(inputDF)
+  val processedDF_parquet = processor.countRowsInDataFrame(inputDFparquet)
+
+
+  writer.write(processedDF, "overwrite", dst_path)
+  writer.writeParquet(processedDF_parquet, "overwrite", dst_path_parquet)
+
+
 }

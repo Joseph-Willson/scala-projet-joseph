@@ -8,7 +8,13 @@ class Writer {
       .write
       .option("header", "true")
       .mode(mode)
-      .csv(path)
+      .csv(s"$path/lecture.csv")
+  }
+
+  def writeParquet(df: DataFrame, mode: String = "overwrite", path: String): Unit = {
+    df.write
+      .mode(mode)
+      .parquet(s"$path/nb_ligne.parquet")
   }
 
 }
