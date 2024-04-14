@@ -91,7 +91,7 @@ object Main extends App with Job {
     .option("path", tableLocation)
     .format("csv")
     .saveAsTable(tableName)
-    .csv(s"$path/lecture.csv")
+
 
 
 
