@@ -123,5 +123,5 @@ object Main extends App with Job {
   val tablePath = "./default/output-writer-hive" // spécifier le chemin où vous souhaitez enregistrer la table
   writer.writeTable(processedDF_hive, tableNametoload, tablePath = tablePath)
 
-
+  //salut
 }
