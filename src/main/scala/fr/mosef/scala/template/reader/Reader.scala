@@ -10,7 +10,7 @@ trait Reader {
 
   def readParquet(path: String): DataFrame
 
-  def readHiveTable(tableName: String): DataFrame
+  def readTable(tableName: String, location: String): DataFrame
 
   def read(): DataFrame
 

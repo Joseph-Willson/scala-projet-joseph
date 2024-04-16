@@ -10,6 +10,8 @@ import fr.mosef.scala.template.writer.Writer
 import org.apache.spark.SparkConf
 import com.globalmentor.apache.hadoop.fs.BareLocalFileSystem
 import org.apache.hadoop.fs.FileSystem
+import org.apache.spark.sql.SaveMode
+
 
 object Main extends App with Job {
 
@@ -20,6 +22,7 @@ object Main extends App with Job {
   } catch {
     case e: java.lang.ArrayIndexOutOfBoundsException => "local[1]"
   }
+
 
 
   val SRC_PATH: String = try {
@@ -38,12 +41,7 @@ object Main extends App with Job {
     }
   }
 
-  // la ya l'erreur chef !!
-  val SRC_PATH_HIVE: String = if (cliArgs.length > 1) {
-    cliArgs(1)
-  } else {
-    "./src/main/ressources/my_table"
-  }
+
 
 
   val DST_PATH: String = try {
@@ -74,32 +72,6 @@ object Main extends App with Job {
 
   sparkSession.sparkContext.hadoopConfiguration.setClass("fs.file.impl",  classOf[ BareLocalFileSystem], classOf[FileSystem])
 
-  val spark = SparkSession.builder()
-    .appName("CreateHiveTable")
-    .enableHiveSupport()
-    .getOrCreate()
-
-  import spark.implicits._
-
-  val data = Seq(
-    (1, "John", 30),
-    (2, "Alice", 25),
-    (3, "Bob", 35)
-  )
-
-  val df = data.toDF("id", "name", "age")
-
-  val tableName = "my_table"
-  val tableLocation = "./src/main/ressources/my_table"
-
-
-  df.write
-    .mode("overwrite")
-    .option("header", "true")
-    .option("path", tableLocation)
-    .format("csv")
-    .saveAsTable(tableName)
-
 
 
 
@@ -109,25 +81,47 @@ object Main extends App with Job {
 
   val src_path = SRC_PATH
   val src_path_parquet = SRC_PATH_PARQUET
-  val src_path_hive = SRC_PATH_HIVE
+
 
   val dst_path = DST_PATH
   val dst_path_parquet = DST_PATH_PARQUET
 
   val inputDF = reader.read(src_path)
   inputDF.show(50)
+
   val inputDFparquet = reader.readParquet(src_path_parquet)
   inputDFparquet.show(50)
-  val inputDFhive = reader.readHiveTable(src_path_hive)
-  inputDFhive.show(50)
+
+
+  // Afficher le contenu du DataFrame
 
 
   val processedDF = processor.process(inputDF)
+
+  val tableName = "my_table"
+  val tableLocation = "./src/main/ressources"
+  processedDF.write
+    .mode(SaveMode.Overwrite)
+    .option("path", tableLocation)
+    .saveAsTable(tableName)
+
   val processedDF_parquet = processor.countRowsInDataFrame(inputDFparquet)
 
 
   writer.write(processedDF, "overwrite", dst_path)
   writer.writeParquet(processedDF_parquet, "overwrite", dst_path_parquet)
+
+  val hiveTableName = "my_table"
+  val hiveTableLocation = "./src/main/ressources"
+  val hiveTableDF = reader.readTable(hiveTableName, hiveTableLocation)
+  hiveTableDF.show(50)
+
+  val columnName = "sum(value)"
+  val processedDF_hive = processor.sumColumn(hiveTableDF, columnName)
+
+  val tableNametoload = "table_loaded" // spécifier le nom de la table
+  val tablePath = "./default/output-writer-hive" // spécifier le chemin où vous souhaitez enregistrer la table
+  writer.writeTable(processedDF_hive, tableNametoload, tablePath = tablePath)
 
 
 }

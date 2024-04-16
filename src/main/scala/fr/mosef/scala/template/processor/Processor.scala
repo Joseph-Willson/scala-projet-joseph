@@ -9,4 +9,6 @@ trait Processor {
 
   def countRowsInDataFrame(dataFrame: DataFrame): DataFrame
 
+  def sumColumn(dataFrame: DataFrame, columnName: String): DataFrame
+
 }

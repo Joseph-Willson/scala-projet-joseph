@@ -17,4 +17,11 @@ class Writer {
       .parquet(path)
   }
 
+  def writeTable(df: DataFrame, tableName: String, mode: String = "overwrite", tablePath: String): Unit = {
+    df.write
+      .mode(mode)
+      .option("path", tablePath)
+      .saveAsTable(tableName)
+  }
+
 }

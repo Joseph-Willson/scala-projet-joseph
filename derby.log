@@ -1,7 +1,7 @@
 ----------------------------------------------------------------
-Sun Apr 14 22:37:34 CEST 2024:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-018e-de54-5df0-000001a7b840 
-on database directory C:\Users\JWill\OneDrive\Bureau\MOSEF\scala-projet-joseph\metastore_db with class loader org.apache.spark.sql.hive.client.IsolatedClientLoader$$anon$1@10afd47 
+Tue Apr 16 04:54:47 CEST 2024:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-018e-e4d4-1171-00000195a3d8 
+on database directory C:\Users\JWill\OneDrive\Bureau\MOSEF\scala-projet-joseph\metastore_db with class loader org.apache.spark.sql.hive.client.IsolatedClientLoader$$anon$1@63f554 
 Loaded from file:/C:/Users/JWill/.m2/repository/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar
 java.vendor=Oracle Corporation
 java.runtime.version=1.8.0_251-b08

@@ -30,10 +30,15 @@ class ReaderImpl(sparkSession: SparkSession) extends Reader {
       .load(path)
   }
 
-  def readHiveTable(tableName: String): DataFrame = {
+  def readTable(tableName: String, location: String): DataFrame = {
     sparkSession
-      .table(tableName)
+      .read
+      .format("parquet")
+      .option("basePath", location)
+      .load(location + "/" + tableName)
   }
+
+
 
   def read(): DataFrame = {
     sparkSession.sql("SELECT 'Empty DataFrame for unit testing implementation")
