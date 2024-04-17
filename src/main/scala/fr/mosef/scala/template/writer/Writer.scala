@@ -1,12 +1,18 @@
 package fr.mosef.scala.template.writer
 
 import org.apache.spark.sql.DataFrame
-class Writer {
+
+import java.io.FileInputStream
+import java.util.Properties
+class Writer(propertiesFilePath: String) {
+
+  val properties: Properties = new Properties()
+  properties.load(new FileInputStream(propertiesFilePath))
 
   def write(df: DataFrame, mode: String = "overwrite", path: String): Unit = {
     df
       .write
-      .option("header", "true")
+      .option("header", properties.getProperty("write_header"))
       .mode(mode)
       .csv(path)
   }

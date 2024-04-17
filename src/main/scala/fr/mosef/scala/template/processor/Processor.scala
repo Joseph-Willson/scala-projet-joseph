@@ -5,7 +5,7 @@ import org.apache.spark.sql.functions.lit
 
 trait Processor {
 
-  def process(inputDF: DataFrame) : DataFrame
+  def process(inputDF: DataFrame, val1: String, val2: String): DataFrame
 
   def countRowsInDataFrame(dataFrame: DataFrame): DataFrame
 
